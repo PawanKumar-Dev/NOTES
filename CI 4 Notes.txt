@@ -1,0 +1,316 @@
+1. To remove index.php from url we do:
+
+	a) Go to app/config/app.php
+	b) Change your baseURL and empty the indexPage too
+	c) Go to your main project and public folder. Here cut the index and htaccess file. Paste them in your main directory
+	d) Edit the index file:
+
+		$pathsConfig = FCPATH . '../app/Config/Paths.php'; to $pathsConfig = FCPATH . 'app/Config/Paths.php';
+
+
+
+2. To implement a view:
+==================================
+public function view() {
+    $data = [
+      'title' => "Hey this is new Heading",
+      'language' => ["HTML", "CSS", "PHP", "SCSS", "JS", "React"]
+    ];
+
+    echo view('header');
+    echo view('welcomeview', $data);  		-->Here we are passing data into a view
+    echo view('footer');
+  }
+
+
+3. In CI4, we can dynamiclly create tables. But first we need to load its class using namespaces.
+=============================================
+use \CodeIgniter\View\Table;
+
+public function index()
+  {
+    $table = new Table();
+    $data = [
+      ['Name', 'City', 'State'],
+      ['Pawan', 'Delhi', 'ND'],
+      ['Raju', 'Haridwar', 'UK'],
+      ['Shayam', 'Kanpur', 'UP']
+    ];
+    $tableview['records'] = $table->generate($data);
+    echo view('dataview', $tableview);
+  }
+
+
+4. We can customize table using $template. Check user guide for more.
+
+5. Parser class processes php variable withoug using any php syntax. This makes our html/view free of php syntax. These varaible are called pseudo-variables. And they are parsed using curly braces {pseudo-variable}
+
+For Controller
+====================
+$parser = \Config\Services::parser();
+
+    $data = [
+      'pgtitle' => "Home Page",
+      'role' => "admin",
+      'language' => [
+        ["title" => "HTML"],
+        ["title" => "CSS"],
+        ["title" => "SCSS"],
+        ["title" => "React"],
+        ["title" => "JS"],
+        ["title" => "PHP"]
+      ]
+    ];
+
+    return $parser->setData($data)->render("home");
+
+
+For View
+======================
+// Simple varaible parsed
+<title>{pgtitle}</title>
+
+// Loop implement
+<ul>
+   {language}
+    <li>{title}</li>
+   {/language}
+</ul>
+
+
+6. You can also create filter for your own. https://codeigniter4.github.io/userguide/outgoing/view_parser.html#filters
+
+
+7. To create layout you need a main base file which will contain all design of a view. We pass a placeholder for content here with this code (Filename: layout/base.php): 
+
+<?= $this->renderSection('content') ?>
+
+
+8. To render this base.php design in actual view. We extend with this code:
+<?= $this->extend('layout/base') ?>
+
+
+9. After installing base theme. We need to render content inside the view. We wrap our code in this:
+<?= $this->section('content') ?> 	--> wrapper need to be used
+    <h1>Hello World!</h1>  		--> actual content
+<?= $this->endSection() ?>
+
+
+10. And you can do this process to many section of contents. This way you can divide the design and dynamic content part.
+
+
+10. Small widgets, or view files can be included via the Partials:
+<?= $this->include('sidebar') ?>
+
+
+11. CI4 Recommends that we put our asset folder into public folder of CI. Then use base_url() for setting their link
+
+12. To generate SEO friendly and readable url. We use routing in CI. Go to APP\CONFIG\routes.php. Here you set new routes with following syntax:
+$routes->get('/hello', 'Welcome::index');
+
+13. Using routes you can make long urls into short one with passing diffrent condition as well. (:num) makes sure we are passing only number. It's called Placeholder.
+$routes->get('/test/(:num)', 'Welcome::test/$1');
+
+
+14. To work with DB. We setup our db in APP/CONFIG/Database.php. Here we have a $default array which has details.
+
+15. If using multiple DBs. Just duplicate and change names of $default. Then we access them in our controller as such
+$db1 = \Config\Database::connect('group_one');		--> Connecting to 1st DB
+$db = \Config\Database::connect('group_two');		--> Connecting to 2nd DB
+
+
+16. Similarly we can configure our DB from env file in root folder. Rename it to .env and then change your DB configuration details.
+
+17. Model are PHP Class file which contains methods to interact with DB itself. We create all our model files inside APP\MODELS.  Models always return the data to Controller who then pass this data into views.
+==============================
+Showmodel.php ------- Model
+==============================
+<?php
+namespace App\Models;
+use CodeIgniter\Model;
+
+class Showmodel extends Model {
+
+  public function getData() {
+    $db = \Config\Database::connect();		--> Connect to default DB
+
+    $builder = $db->table('users');		--> Connecting to User table with Builder
+    $query   = $builder->get();			--> Getting result
+
+    return $query->getResult();			--> returning the results back to controller
+  }
+}
+
+
+18. Next we need to connect our model to controller and then access our data fetching method of model
+==================================
+Showdata.php ------ Controller
+==================================
+<?php
+namespace App\Controllers;
+use \App\Models\Showmodel;			--> Accessing Model in controller
+
+class Showdata extends BaseController
+{
+  public function index()
+  {
+    $showmodel = new Showmodel();		--> Object of Model class to access its methods
+
+    $data['users'] = $showmodel->getData();	--> Holding data in assoc array
+
+    return view('showdata', $data);		--> Passing the data into view
+  }
+}
+
+
+
+19. CI4 has library such as Session, Email, Validation etc. These are classes which have methods and properties which are used repeatdly. All Library are loaded in Controller.
+
+20. You can also create your own custom library in APP\LIBRARIES folder.
+
+21. To send mails we can use native library of CI4. But first we must make some configuration changes in APP\CONFIG\email.php
+==================
+public $protocol = 'smtp';
+public $SMTPHost = 'smtp.gmail.com';				--> If using Gmail smtp
+public $SMTPUser = 'pk687376alternative@gmail.com';		--> Gmail id
+public $SMTPPass = 'password_here';				--> Gmail id's Password
+public $SMTPPort = 465;						--> Gmail smtp port
+public $mailType = 'html';					--> recommended
+public $SMTPCrypto = 'ssl';					--> recommended
+
+
+22. Helpers are predefined functions in CI4 that can help us. Eg. Form Helper, URL Helper, Cookie Helper etc.
+helper('cookie'); 		--> Loading Single Helper
+helper(['cookie', 'date']);	--> Loading multiple Helpers
+
+
+23. We can add our own methods to existing helpers and this is called extending helpers.
+For this we create a file inside the  APP\HELPERS\  folder.
+
+
+24. For Form Validation we use built in library. We load it:
+$validation = \Config\Services::validation();			--> Loading Form Validation Library
+
+$rules = [
+   'name' => 'required|alpha',					--> Setting Rules of 
+   'pass' => 'required|min_length[3]'
+];
+
+if (!$this->validate($rules)) {					--> Running validation
+      
+    $data['validation'] = $this->validator;			--> Storing Validation(error) output
+    return view('formview', $data);				--> Send error to View   
+    } else {
+      echo 'Success';
+    }
+
+
+25. For view we show all errors by:
+$validation->listErrors();
+
+26. For view if we want to access single error and print it we do:
+============================================================
+<?php if(isset($validation)) {
+     echo $validation->getError('name');
+}; ?>
+
+
+27. To see all error while we are developing the app, we change environment to "development". Go to ".env" file in root and change following:
+CI_ENVIRONMENT = development				--> Setting Development Environment
+app.baseURL = 'http://localhost/ci4'			--> Setting Base Url
+
+
+
+28. You can set value in input field. This prevent values from disappering in case of error:
+<input type="text" name="name" value="<?= set_value('name'); ?>">
+
+
+29. Do put your simple view form and checking part of form in diffrent methods
+===============================
+public function index() {
+   return view('contactus');
+}
+
+================================
+public function check()
+  {
+    $validation = \Config\Services::validation();
+    
+    $rules = [
+      'name' => 'required|alpha_space',
+      'email' => 'required|valid_email',
+      'mobile' => 'required|numeric|max_length[10]',
+      'message' => 'required'
+    ];
+
+    if ($this->validate($rules)) {
+      echo "Success";
+    } else {      
+      $data['validation'] = $this->validator;
+      return view('contactus', $data);
+    }
+  }
+
+
+
+30. To get values of Post data. First load the request services.
+==========================================
+$request = \Config\Services::request();
+
+$email = $request->getVar('email', FILTER_SANITIZE_EMAIL);		-->get POST email values and santize it
+$name = $request->getVar('name');					--> get POST name value
+
+
+
+31. To access session we load the services:
+=========================================
+$session = \Config\Services::session();					--> Loading session in Controller
+$page_session = \CodeIgniter\Config\Services::session();		--> Loading session in Views
+
+
+32. Redirect to pages:
+return redirect()->to('/contact');					--> redirecting to contact
+
+
+33. To hide the alert automatically in jQuery
+========================================
+setTimeout(function(){
+  $(".alert").hide();
+}, 2000);
+
+
+34. If we need to use library in multiple methods we can put them in constructor.
+========================================================================
+public $session;
+public function __construct()
+{
+  helper(['url', 'form']);							--> Loading helper
+  $this->session = \Config\Services::session();					--> Loading Session Library
+}
+
+$this->session->setFlashdata('success', 'Data Inserted');			--> Using this session
+
+
+35. Getting id in url. Using routes 
+$routes->get('/activate/(:any)', 'Activate::index/$1');
+
+
+36. Returns data as assoc array in Model:
+return $result->getRowArray();
+
+
+37. To implement Google Auth login. We go to Google Developer Login. Here we go to topbar->project and choose create project.
+Then Provide your project name. After that goto OAuth Consent Screen. Here set your redirect url to login page of your application
+e.g., http://localhost/ci4-app/login
+
+
+38. Next goto Credentials and choose web application when asked for what of application will this be implemented on. You will generate a "Client Id" and "Client secret".
+
+
+39. Go to https://github.com/googleapis/google-api-php-client for guide to download file related to api login. Choose Composer since it's quick and updatable using CMD.
+-- Install api client file
+========================================================================				
+C:\xampp\htdocs\ci4-app\app\Libraries>composer require google/apiclient:^2.12.1
+
+
+40. 

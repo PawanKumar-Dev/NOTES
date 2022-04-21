@@ -1,0 +1,138 @@
+1. go into wp-content. Then into themes.
+
+2. minimum you need two files index.php and style.css
+
+3.  Visit https://codex.wordpress.org/Theme_Development for more info
+
+4. Next put comments in style css which gives us the details of our Wordpress theme
+
+5. Usually we keep our index.php empty
+
+================================================================
+
+6.  Next we create 4 main template page needed in WP theme: header.php, footer.php, page.php and single.php
+
+7. header.php: code for header or navigation across the wp theme
+
+8. footer.php: contains the code of footer the span across the website
+
+9. page.php: contains the body code {for pages. Like aboutus, contactus} etc. These are pages we create in wp in admin
+
+10. single.php: contains the body code for {single blog post only}
+
+11. home.php: contain body code for {blog page} or {Static Page} of website
+
+12. (front-page.php):It has been deprecated. So we don't necesary need it. Home.php fills in for this page in newer version of wp themes
+
+13. insert:  wp_head() before </head> tag
+
+14. insert:  wp_footer() before </body> tag
+
+15. Next we link our footer and header to other template pages using get_header() and get_footer(); functions
+
+16. bloginfo() is another function which gives us info about our wp site. Like bloginfo('title') gives us the name of our website.
+
+17. 404.php: shows up when we try a page that doesn't exist.
+
+18. archive.php
+
+19. search.php: show us the search result here. And sidebar.php: which show us sidebar
+
+20. Next most important topic is:  the loop. It's the basic unit to customize our posts. And in WP all pages, archives, blog posts---they all are part of THE LOOP post type.
+
+21. It's called "THE LOOP". Becoz it contains many function which starts with "the" word.
+<?php 
+	if(have_posts()):
+		while (have_posts()):
+			the_post();
+			the_title();
+			the_category();
+			the_author();
+			the_content();
+
+		endwhile;
+	endif;
+?>
+
+=============================================================================================
+
+22. functions.php:  Function provide various usage in WP. 
+
+23. Like changing language and direction writing(called RTL and LTL) using simple function in head:
+<html <?php language_attributes(); ?>>
+
+24. We can even add rtl.css for this right version of website. WP automatically picks it up.
+
+
+25. adding extra feature your theme like menu, header are part of: 
+add_theme_support(); function
+
+26. add_theme_support('post-thumbnails'); gives us featured images support in our posts.
+
+27. register_sidebar(); gives us access to sidebar in our theme. Do add get_sidebar(); in your template page.
+
+28. add_theme_support('woocommerce'); willl add support for woo commerce in your theme.
+
+29. add_theme_support('title-tag'); will inject title tag dynamiclly.
+
+30. <?php wp_nav_menu( array( 'theme_location' => 'header-menu' ) ); ?> for showing menu in header. But we need to register it in function.php.
+
+===================================================================================================
+
+31. get_template_directory();   gives us the path of directory theme. And its useful when including files. get_stylesheet_directory(); does same thing.
+
+32. But diffrence b/w them is, when their is a child theme and a parent theme-- we use ""get_template_directory();"" for parent theme. And "get_stylesheet_directory();" for child theme
+
+33. Similar to above functions are:
+get_template_directory_uri()	-----gives us url of parent theme
+get_stylesheet_directory_uri()   ----gives us url of child theme
+
+
+34. get_stylesheet_uri();	----gives the complete path to style.css file
+
+=============================================================================================
+
+35. Hooks are a way for one piece of code to interact/modify another piece of code in wordpress. They are cruical in theme and plugin interacting with each other or core Wordpress itself.
+
+36. There are two main type of hooks: Action and Filters.
+Action hooks does something and get terminated. But filter hooks does something and returns value.
+
+37. Both filters and action hooks can have main 3 functions:
+do filter|do actions -- remove filters|remove actions -- add filters|add actions
+
+https://profbrown.org/p/wp_hooks/hook
+
+
+38. Simple hooks are first defined inside the functions.php and then called on other pages.
+
+// Hooks callback function
+function myhook_function() {
+	echo "<h1>This is an action hook working!</h1>";
+}
+
+//define an action hook
+add_action('my_first_hook', 'myhook_function', 10);
+
+// Then in Home.php we call this hook.
+do_action('my_first_hook');
+
+
+39. Priroty(that's the 3rd argument in add_action()) let us know which hook should run first if there are competing hooks.
+
+
+40. Unlike Action hooks, our filters return data, so they take arugment too. Then this data is filtered(modified in some way) and then given to us by apply_filters().
+
+// Callback function take argument and return the data
+function mytextfilter($argument) {
+	return "<h2 style='color:red'>$argument</h2>";
+}
+
+// Adding filter similar to action hook
+add_filter('my_first_filter', 'mytextfilter');
+
+// Calling the filter with argument
+echo apply_filters('my_first_filter', "Hello there, this is filtered!");
+
+
+41. It's recommended by WP to use hooks to register your navbars, sidebars etc. So when sometime website is slow loading then it doesn't break up.
+

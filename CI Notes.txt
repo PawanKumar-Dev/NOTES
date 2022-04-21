@@ -1,0 +1,91 @@
+1. To remove the public part from url and directly access it. we simply copy and paste .htaccess and index.php from public folder into main folder. And do set your path in index.php
+
+2. We can use closure(anoynoumus function) to call views directly from routes.
+$routes->get('/about', function(){
+    echo view('about');
+});
+
+3.When creating controller always define controller with capitalize first letter. this is the standard way. Even though in smallcase it works
+
+4. Creating model is same as controller.
+
+5. To show hidden error. we need to save env file to .env file and uncomment the line and change production to development
+# CI_ENVIRONMENT = development
+
+6. For inserting data from form using the builder way
+public function insert()
+    {
+    	$password = $this->request->getVar('password');
+
+    	$data = ['password' => $password];
+
+    	$db = \Config\Database::connect();
+		$builder = $db->table('users');
+
+		$builder->insert($data);
+    }
+
+7. For model's basics:
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class UserModel extends Model
+{
+	protected $table = 'users';
+    protected $allowedFields = ['fname', 'lname', 'email', 'password'];
+}
+
+
+
+8. but you can insert data using your model too
+$model = new UserModel;
+$model->insert($data);
+
+
+9. Pagination
+
+$this->load->library('pagination');
+    $config['base_url'] = base_url('admin/adminpanel');
+    $config['total_rows'] = $this->loginModel->num_rows();
+    $config['per_page'] = 2;
+    $this->pagination->initialize($config);
+
+    $data['rows'] = $this->loginModel->getAllArticles($config['per_page'], $this->uri->segment(3));
+    $this->load->view('admin/panel', $data);
+
+
+10. To fix serial no. after pagination
+<?php if(count($rows)): 
+        $count = $this->uri->segment(3);?>
+      <?php foreach($rows as $record): ?>
+      <tr>
+        <th scope="row"><?= ++$count; ?>.</th>
+
+
+11. To maintain logs in ci we can go to config file then search for:
+
+$config['log_threshold'] = 4;
+
+
+12. cart:
+$this->load->library('cart');
+
+$data = [
+	'id'      => $result->id,
+	'qty'     => 1,
+	'price'   => $result->price,
+	'name'    => $result->name
+	];
+
+$this->cart->insert($data);
+
+13. <?php echo $this->cart->total_items(); ?>  gives total items
+
+14. to remove cart item in ci we use:
+$this->cart->remove($rowid)
+
+
+15. 

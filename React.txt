@@ -1,0 +1,136 @@
+1. Creating SPA in react with Node 14+ and NPM 5.6+, we do
+npx create-react-app my-app
+
+
+2. Then go inside that folder and run with NPM.
+cd my-app
+npm start
+
+2.1 Most important files are:
+public/index.html		---Most Important
+src/index.js			---Most Important
+package.json			---Important
+
+
+3. React works by manipulatin the VirtualDOM. Which the exact replica of your original DOM. With virtual dom we avoid directly manupulating the DOM.
+
+
+4. JSX - is Javascript Syntax XML. Its allows to write React component in easy way. And beside JSX there are other methods too.
+
+
+5. Components: In react every part of html is broken apart in small fragments so that it can be reused again and again. These pieces are written and manaect in diffrent .JSX files. They are exported via JS modern way and then imported when and where we want to use them.
+
+5.1 To display data in React, we go to index.js and import 2 important modules/components.
+These modules are part of Babel. Which converts our ES6 code into vanilla JS that browsers understand.
+
+import React from "react";
+import ReactDOM from "react-dom";
+
+
+6. Types of Components: Functional Components and Class components.
+
+7. Functional Components are basic JS functions. You can use normal functions or Arrow function(which is more popular with React). 
+
+7.1. These are mainly used in UI Components(ex - button components). They don't use the render method like Class components. Can accept Props and use them easily.
+
+7.2 Functional components are favored one unless you are using "React State".
+
+7.3 Note: All component name start capitalize.
+======================================================
+Heading.jsx ----a functional component
+======================================================
+import React from 'react';
+
+function Heading() {
+  return <h1>Learning Components in React</h1>;
+}
+
+export default Heading;
+
+
+
+8. Class Components: They use ES6 Class and extend the component class in react. Also called "Smart" & "Stateful" components becz we write logic and state inside these components.
+
+8.1 React Lifecycle methods can be used inside the class components(although they are completely optional). Ex. componentDidMount
+
+8.2
+======================================================
+App.jsx ----as a class component
+======================================================
+import React from 'react';
+
+class App extends React.Component {
+  render() {
+    return <h1>Hello from Class components</h1>
+  }
+}
+
+export default App;
+
+
+
+9. Props: Stands for properties. They(Props) are arguments passed into React components Or argument passed into React component functions.
+Header is a functional component being used here. And we pass "name" as prop inside it whose value is Pawan
+
+======================================================
+App.jsx file
+======================================================
+<Header name="Pawan" />
+
+
+======================================================
+Header.jsx
+======================================================
+const Header = (props) => {
+  return <h1>Header Functional Component, {props.name}</h1>;
+}
+
+
+10. If we want to access element inside the components we can do via props.children.
+=========================
+<Header>
+   <p>content passed inside the component and accessing via prop</p>
+</Header>
+
+===================================
+const Header = (props) => {
+  return <h4>{props.children}</h4>
+}
+
+
+11. Props are immutable in nature. Meaning their value cannot be changed once defined.
+
+
+12. State: It's a React object just like prop. It can contain data about the component just like prop. But unlike prop, a component's state can change over time, whenever it changes the component re-renders.
+===============================================
+class Maincontent extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      content: "This content will change"
+    }
+  }
+
+  contentChange() {
+    this.setState ({
+      content: "Content has changed"
+    })
+  }
+
+  render() {
+    return (
+      <>
+        <h1>{this.state.content}</h1>
+        <button className='btn' onClick={() => this.contentChange()}>Click</button>
+      </>
+    )
+  }
+}
+
+
+13. Using class components we first create the constuctor(). Then use super() method to access component from React and then we use  "this.state" for setting the state content. 
+
+14. Then we can manipulate state using this.setState() function too.
+
+15. 
